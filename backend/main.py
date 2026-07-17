@@ -69,16 +69,16 @@ def seed_database():
 
     print("BD vacía detectada. Descargando perfil, proyectos y experiencia...")
     
-    # 1. Perfil Profesional
+    # 1. Perfil Profesional (Honesto, robusto y enfocado en tus fortalezas reales)
     perfil = models.Profile(
         name="Abdiel Antonio Magaña Ayala",
-        title="Estudiante de Ingeniería en Sistemas | Desarrollador de Software & Seguridad TI",
+        title="Estudiante de Ingeniería en Sistemas | Desarrollador de Software & Infraestructura",
         location="Mérida, Yucatán, México",
-        about="Estudiante de Ingeniería en Sistemas orientado al desarrollo de software modular, arquitectura contenerizada (Docker) y bases de datos relacionales (PostgreSQL). Capaz de entregar soluciones integrales con documentación técnica, guías de despliegue y capacitación de usuarios.",
+        about="Estudiante de Ingeniería en Sistemas orientado al desarrollo de software modular, administración de bases de datos relacionales (PostgreSQL) y despliegue de aplicaciones contenerizadas (Docker). Gran interés en el aprendizaje continuo de ciberseguridad, redes y buenas prácticas de documentación técnica.",
         skills=[
             "Desarrollo Full Stack", "Docker & Contenedores", "PostgreSQL / SQL",
-            "Ciberseguridad", "Arquitectura de Redes", "Documentación Técnica", 
-            "Linux / WSL", "Python", "React", "Node.js", "FastAPI", "Git / GitHub"
+            "Fundamentos de Ciberseguridad", "Linux / WSL", "Documentación Técnica", 
+            "Python", "React", "Node.js", "FastAPI", "Git / GitHub"
         ]
     )
     db.add(perfil)
@@ -86,13 +86,13 @@ def seed_database():
     # 2. Proyecto Destacado: FotoIdeas App
     fotoideas = models.Project(
         title="FotoIdeas App (POS System)",
-        description="Sistema integral de Punto de Venta (POS) y gestión operativa. Co-desarrollador de la arquitectura backend en Node.js, frontend en React y base de datos relacional en PostgreSQL dentro de Docker. Incluye documentación técnica completa y manuales de capacitación.",
+        description="Sistema integral de Punto de Venta (POS) y gestión operativa. Co-desarrollador de la arquitectura backend en Node.js, frontend en React y base de datos relacional en PostgreSQL dentro de Docker. Incluye documentación técnica completa y manuales de capacitación para usuarios.",
         tech_stack=["Node.js", "React", "PostgreSQL", "Docker", "Git", "Documentación"],
         link="https://github.com/Gadiel-Sosa/fotoideas-app"
     )
     db.add(fotoideas)
 
-    # 3. Descarga de GitHub filtrando TODAS las tareas escolares de Pilas, Colas y Exámenes
+    # 3. Descarga de GitHub filtrando tareas escolares
     GITHUB_USER = "Pan-di-tas" 
     
     REPOS_IGNORADOS = [
@@ -100,7 +100,8 @@ def seed_database():
         "Metodos-de-ordenamiento", "ADA-6-Programa-grafos", "Arbol",
         "Lista-ligada", "Metodos-de-busqueda", "intercalacion", "Shellsort",
         "Practica-2-colas", "ADA2---Colas", "PRACT1---Estruc-Pilas", 
-        "Pilas_ADA_1", "pila", "pp", "Practica-2", "Ejemplo3SB"
+        "Pilas_ADA_1", "pila", "pp",
+        "Practica-2", "Ejemplo3SB"
     ]
 
     try:
@@ -110,11 +111,8 @@ def seed_database():
             repos = response.json()
             for repo in repos:
                 nombre = repo["name"]
-                
-                # Excluimos forks, repos de configuración y cualquier ejercicio de la lista
                 if not repo["fork"] and nombre not in REPOS_IGNORADOS and nombre != GITHUB_USER:
                     desc = repo["description"]
-                    
                     if not desc:
                         if "Libreria" in nombre:
                             desc = "Librería algorítmica de alto rendimiento implementada en Python para la optimización y procesamiento de métodos de ordenamiento."
@@ -131,15 +129,15 @@ def seed_database():
     except Exception as e:
         print(f"Error al conectar con la API de GitHub: {e}")
 
-    # 4. Experiencia Real & Gestión de Operaciones
+    # 4. Experiencia Real & Gestión
     exp_fotoideas = models.Experience(
-        role="Co-desarrollador Full Stack & Arquitecto de Software",
-        company="FotoIdeas App (Proyecto Validado por la Industria)",
+        role="Co-desarrollador Full Stack & Arquitectura",
+        company="FotoIdeas App (Sistema POS Comercial)",
         period="2026 — Presente",
         description=[
             "Desarrollo e implementación de un sistema de Punto de Venta (POS) comercial utilizando Node.js, React y bases de datos PostgreSQL contenerizadas en Docker.",
             "Creación integral de la documentación técnica, manuales de usuario y guías estructuradas para el despliegue del sistema y la capacitación de clientes finales.",
-            "Proyecto evaluado y validado por ingenieros del sector privado, generando ofertas de colocación laboral gracias al rigor técnico de la arquitectura y su usabilidad."
+            "Estructuración de flujos de trabajo modulares y resolución de problemas de integración entre el frontend y el backend."
         ]
     )
     
@@ -158,7 +156,7 @@ def seed_database():
     db.add(exp_negocio)
         
     db.commit()
-    print("¡Base de datos populada, filtrada y enfocada exitosamente!")
+    print("¡Base de datos populada, filtrada y realista exitosamente!")
 
 # --- ENDPOINTS ---
 @app.get("/")
