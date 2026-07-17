@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cv_postgres_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cv_network
+
+  api:
+    build: ./backend
+    container_name: cv_fastapi_backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - cv_network
+
+volumes:
+  postgres_data:
+
+networks:
+  cv_network:
+    driver: bridge
