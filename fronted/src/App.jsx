@@ -6,7 +6,7 @@ function App() {
 
   useEffect(() => {
     // Si lo subes a Render, reemplaza esta URL local por el link de tu API en vivo
-    fetch('http://127.0.0.1:8000/api/cv')
+    fetch('[https://my-interactive-cv-cgc6.onrender.com/api/cv](https://my-interactive-cv-cgc6.onrender.com/api/cv)')
       .then((response) => response.json())
       .then((data) => {
         setCvData(data);
