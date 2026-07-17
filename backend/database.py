@@ -1,37 +1,32 @@
 import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# Cargar variables del archivo .env (está en la carpeta raíz, un nivel arriba de backend)
-load_dotenv(dotenv_path="../.env")
+# 1. Intentar leer DATABASE_URL (la variable estándar que configuramos en Render)
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Leemos estrictamente las variables del entorno sin ningún valor hardcodeado
-USER = os.getenv("POSTGRES_USER")
-PASSWORD = os.getenv("POSTGRES_PASSWORD")
-HOST = os.getenv("POSTGRES_HOST")
-PORT = os.getenv("POSTGRES_PORT")
-DB_NAME = os.getenv("POSTGRES_DB")
+# 2. Si no existe DATABASE_URL, intentamos armarla con las variables sueltas de tu .env local
+if not SQLALCHEMY_DATABASE_URL:
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    server = os.getenv("POSTGRES_SERVER") or os.getenv("POSTGRES_HOST", "localhost")
+    db = os.getenv("POSTGRES_DB")
+    
+    if user and password and db:
+        SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{server}/{db}"
+    else:
+        raise ValueError("🚨 Error de seguridad/configuración: Faltan variables de entorno de la base de datos. Verifica tu archivo .env o la pestaña Environment en Render.")
 
-# Medida de seguridad: Si falta alguna credencial crítica, detenemos la ejecución
-if not all([USER, PASSWORD, HOST, PORT, DB_NAME]):
-    raise ValueError(
-        "🚨 Error de seguridad/configuración: Faltan variables de entorno de la base de datos. Verifica tu archivo .env"
-    )
+# 3. Corrección vital para servidores en la nube:
+# SQLAlchemy 1.4+ exige que la URL empiece con 'postgresql://', pero Render a veces genera URLs con 'postgres://'.
+if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# URL de conexión limpia
-DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
-
-# Crear el motor de conexión
-engine = create_engine(DATABASE_URL)
-
-# Sesión para interactuar con la BD en los endpoints
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Clase base de la que heredarán nuestros modelos
 Base = declarative_base()
 
-# Dependencia para inyectar la sesión en FastAPI
 def get_db():
     db = SessionLocal()
     try:
